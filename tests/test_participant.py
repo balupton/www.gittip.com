@@ -305,23 +305,11 @@ class Tests(Harness):
 
     # get_dollars_receiving - gdr
 
-    def make_payday(self):
-        ts_start = datetime.datetime.now(pytz.utc)
-        ts_end = ts_start + datetime.timedelta(seconds=100)
-        self.db.run("INSERT INTO paydays (ts_start, ts_end) VALUES (%s, %s)", (ts_start, ts_end))
-        return ts_start
-
-    def make_transfer(self, ts_start, tipper, tippee, amount):
-        self.db.run("INSERT INTO transfers (timestamp, tipper, tippee, amount)" +
-                    "VALUES (%s, %s, %s, %s)",
-                        (ts_start + datetime.timedelta(seconds=1), tipper, tippee, amount))
-
     def test_gdr(self):
         alice = self.make_participant('alice')
         bob = self.make_participant('bob')
 
-        ts_start = self.make_payday()
-        self.make_transfer(ts_start, 'bob', 'alice', '3.00')
+        self.make_payday(('bob', 'alice', '3.00'))
 
         expected = Decimal('3.00')
         actual = alice.get_dollars_receiving()
